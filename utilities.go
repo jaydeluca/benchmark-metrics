@@ -7,18 +7,22 @@ import (
 	"time"
 )
 
+var (
+	layout = "2006-01-02"
+)
+
 func generateTimeframeToToday(start string, interval int) ([]string, error) {
 	currentTime := time.Now()
-	return generateTimeframeSlice(start, currentTime.Format("2006-01-02"), interval)
+	return generateTimeframeSlice(start, currentTime.Format(layout), interval)
 }
 
 func generateTimeframeSlice(start, end string, interval int) ([]string, error) {
-	startDate, err := time.Parse("2006-01-02", start)
+	startDate, err := time.Parse(layout, start)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse start date: %v", err)
 	}
 
-	endDate, err := time.Parse("2006-01-02", end)
+	endDate, err := time.Parse(layout, end)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse end date: %v", err)
 	}
@@ -28,7 +32,7 @@ func generateTimeframeSlice(start, end string, interval int) ([]string, error) {
 	// Increment the start date by the interval until it reaches or exceeds the end date
 	currentDate := startDate
 	for currentDate.Before(endDate) || currentDate.Equal(endDate) {
-		dateList = append(dateList, currentDate.Format("2006-01-02"))
+		dateList = append(dateList, currentDate.Format(layout))
 		currentDate = currentDate.AddDate(0, 0, interval)
 	}
 
@@ -58,6 +62,5 @@ func splitByMultipleSpaces(input string) []string {
 			cleanedValues = append(cleanedValues, trimmedValue)
 		}
 	}
-
 	return cleanedValues
 }

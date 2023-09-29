@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -44,7 +44,7 @@ func (c *GitHubClient) GetMostRecentCommit(repo, timestamp, branch string) (stri
 
 	if response.StatusCode == http.StatusOK {
 		defer response.Body.Close()
-		body, err := ioutil.ReadAll(response.Body)
+		body, err := io.ReadAll(response.Body)
 		if err != nil {
 			return "", err
 		}
@@ -80,7 +80,7 @@ func (c *GitHubClient) GetFileAtCommit(repository, filepath, commitSHA string) (
 
 	if response.StatusCode == http.StatusOK {
 		defer response.Body.Close()
-		body, err := ioutil.ReadAll(response.Body)
+		body, err := io.ReadAll(response.Body)
 		if err != nil {
 			return "", err
 		}

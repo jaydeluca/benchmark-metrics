@@ -1,8 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"reflect"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -36,29 +35,27 @@ Peak threads        :                42               53               55`
 func TestParseDateFromSummary(t *testing.T) {
 	expected := "2023-09-01"
 	result := ParseReport(report)
-	if expected != result.Date.Format("2006-01-02") {
-		t.Errorf(fmt.Sprintf("should be equal %s %s", expected, result.Date))
-	}
+	assert.Equal(t, expected, result.Date.Format("2006-01-02"))
 }
 
 func TestParseConfigsFromReport(t *testing.T) {
-	expected := []string{"none", "latest", "snapshot"}
+	expected := []string{"latest", "snapshot", "none"}
 	result := ParseReport(report)
-	if reflect.DeepEqual(expected, result) {
-		t.Errorf(fmt.Sprintf("should be equal"))
+
+	var entities []string
+	for entity := range result.Metrics {
+		entities = append(entities, entity)
 	}
+
+	assert.ElementsMatch(t, expected, entities)
 }
 
 func TestParseMetricsFromReport(t *testing.T) {
 	expected := 92.64
 	result := ParseReport(report).Metrics["none"]["Min heap used (MB)"]
-	if expected != result {
-		t.Errorf(fmt.Sprintf("should be equal"))
-	}
+	assert.Equal(t, expected, result)
 
 	expected = 53
 	result = ParseReport(report).Metrics["latest"]["Peak threads"]
-	if expected != result {
-		t.Errorf(fmt.Sprintf("should be equal"))
-	}
+	assert.Equal(t, expected, result)
 }

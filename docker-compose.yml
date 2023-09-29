@@ -42,5 +42,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://otel-collector:4317
+    volumes:
+      - ./cache:/app/cache
     depends_on:
       - otel-collector

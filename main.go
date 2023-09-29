@@ -8,7 +8,6 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"os"
-	"strings"
 )
 
 func main() {
@@ -16,15 +15,41 @@ func main() {
 	repo := "open-telemetry/opentelemetry-java-instrumentation"
 	filePath := "benchmark-overhead/results/release/summary.txt"
 
+	// Cache API calls to github to prevent repeated calls when testing
+	commitCache := NewSingleFileCache("cache/commit-cache.json")
+	reportCache := NewSingleFileCache("cache/report-cache.json")
+
 	client := NewGitHubClient(token)
 
-	timeframe, _ := generateTimeframeToToday("2023-04-01", 30)
+	timeframe, _ := generateTimeframeToToday("2022-02-14", 7)
 
 	dataPoints := map[string][]metricdata.DataPoint[float64]{}
 
 	for _, timestamp := range timeframe {
-		commit, _ := client.GetMostRecentCommit(repo, timestamp, "gh-pages")
-		contents, _ := client.GetFileAtCommit(repo, filePath, commit)
+		var commit string
+		cached, _ := commitCache.RetrieveValue(timestamp)
+		if cached == "" {
+			commit, _ = client.GetMostRecentCommit(repo, timestamp, "gh-pages")
+			err := commitCache.AddToCache(timestamp, commit)
+			if err != nil {
+				fmt.Println("Error adding to cache")
+			}
+		} else {
+			commit = cached
+		}
+
+		var contents string
+		cached, _ = reportCache.RetrieveValue(timestamp)
+		if cached == "" {
+			contents, _ = client.GetFileAtCommit(repo, filePath, commit)
+			err := reportCache.AddToCache(timestamp, contents)
+			if err != nil {
+				fmt.Println("Error adding to cache")
+			}
+		} else {
+			contents = cached
+		}
+
 		report := ParseReport(contents)
 		for entity, metrics := range report.Metrics {
 
@@ -39,16 +64,13 @@ func main() {
 		}
 	}
 
-	panels := []string{}
+	var metricNames []string
 
 	var metrics []metricdata.Metrics
 	for metric, metricData := range dataPoints {
 		metrics = append(metrics, *generateMetrics(metric, metricData))
-		panels = append(panels, generatePanel(metric, metric))
+		metricNames = append(metricNames, metric)
 	}
-
-	dashboard := generateDashboard(strings.Join(panels, ","))
-	fmt.Print(dashboard)
 
 	resourceMetrics := generateResourceMetrics(metrics)
 
@@ -67,7 +89,9 @@ func main() {
 	otel.SetMeterProvider(meterProvider)
 
 	// export to collector
-	fmt.Sprintf("Exporting metrics")
+	fmt.Println("Exporting metrics")
 	_ = exp.Export(ctx, resourceMetrics)
 
+	// Update Dashboard based on metrics
+	generateDashboard(metricNames)
 }
