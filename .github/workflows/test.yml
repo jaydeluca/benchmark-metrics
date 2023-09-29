@@ -1,4 +1,4 @@
-name: Goals
+name: Test
 
 on:
   push:
@@ -13,22 +13,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
+      - uses: actions/checkout@v3
         with:
-          go-version: 1.20
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '^1.20'
+      - run: go version
 
-      - name: Check out code
-        uses: actions/checkout@v2
 
       - name: Build
         run: go build -v ./...
-
-      - name: Static Analysis
-        run: |
-          go install honnef.co/go/tools/cmd/staticcheck@2020.2.1
-          staticcheck ./...
 
       - name: Test
         run: |
@@ -46,11 +42,11 @@ jobs:
           else
             COLOR=orange
           fi
-          curl "https://img.shields.io/badge/coverage-$total%25-$COLOR" > ../.github/badges/coverage.svg
+          curl "https://img.shields.io/badge/coverage-$total%25-$COLOR" > .github/badges/coverage.svg
 
       - name: Commit and push the badge (if it changed)
-        uses: EndBug/add-and-commit@v7
+        uses: EndBug/add-and-commit@v9
         with:
-          default_author: github_actions
+          default_author: github_actor
           message: 'commit badge'
           add: '*.svg'

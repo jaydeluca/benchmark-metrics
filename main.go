@@ -30,7 +30,10 @@ func main() {
 		cached, _ := commitCache.RetrieveValue(timestamp)
 		if cached == "" {
 			commit, _ = client.GetMostRecentCommit(repo, timestamp, "gh-pages")
-			commitCache.AddToCache(timestamp, commit)
+			err := commitCache.AddToCache(timestamp, commit)
+			if err != nil {
+				fmt.Println("Error adding to cache")
+			}
 		} else {
 			commit = cached
 		}
@@ -39,7 +42,10 @@ func main() {
 		cached, _ = reportCache.RetrieveValue(timestamp)
 		if cached == "" {
 			contents, _ = client.GetFileAtCommit(repo, filePath, commit)
-			reportCache.AddToCache(timestamp, contents)
+			err := reportCache.AddToCache(timestamp, contents)
+			if err != nil {
+				fmt.Println("Error adding to cache")
+			}
 		} else {
 			contents = cached
 		}
@@ -83,7 +89,7 @@ func main() {
 	otel.SetMeterProvider(meterProvider)
 
 	// export to collector
-	fmt.Sprintf("Exporting metrics")
+	fmt.Println("Exporting metrics")
 	_ = exp.Export(ctx, resourceMetrics)
 
 	// Update Dashboard based on metrics

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 )
 
@@ -14,7 +13,7 @@ func NewSingleFileCache(location string) *SingleFileCache {
 	if _, err := os.Stat(location); os.IsNotExist(err) {
 		// Create an empty JSON file if it doesn't exist
 		data := []byte("{}")
-		err := ioutil.WriteFile(location, data, 0644)
+		err := os.WriteFile(location, data, 0644)
 		if err != nil {
 			panic(err)
 		}
@@ -27,7 +26,7 @@ func NewSingleFileCache(location string) *SingleFileCache {
 
 func (c *SingleFileCache) AddToCache(key string, value string) error {
 	// Read the existing cache
-	data, err := ioutil.ReadFile(c.location)
+	data, err := os.ReadFile(c.location)
 	if err != nil {
 		return err
 	}
@@ -48,7 +47,7 @@ func (c *SingleFileCache) AddToCache(key string, value string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(c.location, updatedData, 0644)
+	err = os.WriteFile(c.location, updatedData, 0644)
 	if err != nil {
 		return err
 	}
@@ -58,7 +57,7 @@ func (c *SingleFileCache) AddToCache(key string, value string) error {
 
 func (c *SingleFileCache) RetrieveValue(key string) (string, error) {
 	// Read the existing cache
-	data, err := ioutil.ReadFile(c.location)
+	data, err := os.ReadFile(c.location)
 	if err != nil {
 		return "", err
 	}

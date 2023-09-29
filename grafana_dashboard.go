@@ -26,7 +26,10 @@ func generateDashboard(metrics []string) {
 
 	// Update Dashboard based on metrics
 	dashboard := generateDashboardJson(strings.Join(panels, ","))
-	os.WriteFile("grafana/dashboards/instrumentation-benchmarks.json", []byte(dashboard), 0644)
+	err := os.WriteFile("grafana/dashboards/instrumentation-benchmarks.json", []byte(dashboard), 0644)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func generateDashboardJson(panels string) string {

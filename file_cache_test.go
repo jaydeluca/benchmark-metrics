@@ -7,10 +7,21 @@ import (
 
 func TestCacheAdd(t *testing.T) {
 	cache := NewSingleFileCache("test-cache")
-	cache.AddToCache("test", "value")
-	value, _ := cache.RetrieveValue("test")
+	err := cache.AddToCache("test", "value")
+	if err != nil {
+		t.Failed()
+	}
+
+	value, err := cache.RetrieveValue("test")
+	if err != nil {
+		t.Failed()
+	}
+
 	assert.Equal(t, "value", value)
 	empty, _ := cache.RetrieveValue("not existent")
 	assert.Empty(t, empty)
-	cache.DeleteCache()
+	err = cache.DeleteCache()
+	if err != nil {
+		t.Failed()
+	}
 }
