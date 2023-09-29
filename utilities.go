@@ -58,6 +58,5 @@ func splitByMultipleSpaces(input string) []string {
 			cleanedValues = append(cleanedValues, trimmedValue)
 		}
 	}
-	fmt.Sprintf("%s", len(cleanedValues))
 	return cleanedValues
 }
