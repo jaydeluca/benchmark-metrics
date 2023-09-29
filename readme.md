@@ -1,6 +1,6 @@
 # Benchmark Metrics
 
-![Coverage](../.github/badges/coverage.svg)
+![Coverage](.github/badges/coverage.svg)
 
 ## Context
 
