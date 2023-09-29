@@ -1,5 +1,9 @@
 # Benchmark Metrics
 
+![Coverage](../.github/badges/coverage.svg)
+
+## Context
+
 Given a repository with a branch that includes reports of benchmark test runs, convert this data into timeseries metrics 
 that can be visualized in grafana.
 
