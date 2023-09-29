@@ -1,8 +1,35 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"strings"
+)
 
-func generateDashboard(panels string) string {
+func generateDashboard(metrics []string) {
+	var panels []string
+	var currentX = 0
+	var currentY = 0
+	panelWidth := 8
+	panelHeight := 8
+	panelsPerRow := 3
+
+	for _, metric := range metrics {
+		panels = append(panels, generatePanel(metric, metric, panelHeight, panelWidth, currentX, currentY))
+		// Update the current position for the next panel
+		currentX += panelWidth
+		if currentX >= panelsPerRow*panelWidth {
+			currentX = 0
+			currentY += panelHeight
+		}
+	}
+
+	// Update Dashboard based on metrics
+	dashboard := generateDashboardJson(strings.Join(panels, ","))
+	os.WriteFile("grafana/dashboards/instrumentation-benchmarks.json", []byte(dashboard), 0644)
+}
+
+func generateDashboardJson(panels string) string {
 	return fmt.Sprintf(`{
   "annotations": {
     "list": [
@@ -49,7 +76,15 @@ func generateDashboard(panels string) string {
 }`, panels)
 }
 
-func generatePanel(metricName, friendlyName string) string {
+func generatePanel(metricName, friendlyName string, panelHeight, panelWidth, currentX, currentY int) string {
+
+	gridPos := fmt.Sprintf(`{
+        "h": %d,
+        "w": %d,
+        "x": %d,
+        "y": %d
+    }`, panelHeight, panelWidth, currentX, currentY)
+
 	return fmt.Sprintf(`{
       "datasource": {
         "type": "grafana-clickhouse-datasource",
@@ -108,12 +143,7 @@ func generatePanel(metricName, friendlyName string) string {
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 0
-      },
+      "gridPos": %s,
       "id": 1,
       "options": {
         "legend": {
@@ -149,5 +179,5 @@ func generatePanel(metricName, friendlyName string) string {
       ],
       "title": "%s",
       "type": "timeseries"
-    }`, metricName, friendlyName)
+    }`, gridPos, metricName, friendlyName)
 }

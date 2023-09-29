@@ -13,7 +13,6 @@ type ReportMetrics struct {
 }
 
 func ParseReport(report string) ReportMetrics {
-
 	split := strings.Split(report, "----------------------------------------------------------\n")
 	date := strings.Split(strings.Split(split[1], "Run at ")[1], "\n")[0]
 
@@ -32,11 +31,21 @@ func ParseReport(report string) ReportMetrics {
 		if strings.HasPrefix(line, "Agent") || strings.HasPrefix(line, "Run duration") || line == "" {
 			continue
 		}
+
+		// Bad data in some of the reports
+		if strings.Contains(line, "8796093022208.00") {
+			continue
+		}
+
 		metricList := strings.Split(line, ":")
 		metricName := strings.TrimSpace(metricList[0])
+
 		for index, value := range entities {
-			thisMetric, _ := strconv.ParseFloat(splitByMultipleSpaces(metricList[1])[index], 32)
-			metrics[value][metricName] = math.Round(thisMetric*100) / 100
+			silo := splitByMultipleSpaces(metricList[1])
+			thisMetric, err := strconv.ParseFloat(silo[index], 32)
+			if err == nil {
+				metrics[value][metricName] = math.Round(thisMetric*100) / 100
+			}
 		}
 	}
 
