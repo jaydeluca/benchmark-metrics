@@ -8,13 +8,18 @@ import (
 	"net/http"
 )
 
+type ReportSource interface {
+	GetMostRecentCommit(repo, timestamp, branch string) (string, error)
+	GetFileAtCommit(repository, filepath, commitSHA string) (string, error)
+}
+
 type GitHubClient struct {
 	BaseURL string
 	token   string
 	client  *http.Client
 }
 
-func NewGitHubClient(token string) *GitHubClient {
+func NewGitHubClient(token string) ReportSource {
 	client := &http.Client{}
 	return &GitHubClient{
 		BaseURL: "https://api.github.com",

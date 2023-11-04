@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func generateDashboard(metrics []string) {
+func generateDashboard(title string, metrics []string) {
 	var panels []string
 	var currentX = 0
 	var currentY = 0
@@ -25,14 +25,14 @@ func generateDashboard(metrics []string) {
 	}
 
 	// Update Dashboard based on metrics
-	dashboard := generateDashboardJson(strings.Join(panels, ","))
-	err := os.WriteFile("grafana/dashboards/instrumentation-benchmarks.json", []byte(dashboard), 0644)
+	dashboard := generateDashboardJson(title, strings.Join(panels, ","))
+	err := os.WriteFile(fmt.Sprintf("grafana/dashboards/instrumentation-benchmarks-%v.json", title), []byte(dashboard), 0644)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func generateDashboardJson(panels string) string {
+func generateDashboardJson(title, panels string) string {
 	return fmt.Sprintf(`{
   "annotations": {
     "list": [
@@ -72,15 +72,14 @@ func generateDashboardJson(panels string) string {
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Java Instrumentation Benchmarks",
-  "uid": "dfc2be2e-f435-4ebf-956a-782d7d16c6b0",
+  "title": "Benchmarks (%v)",
+  "uid": "",
   "version": 2,
   "weekStart": ""
-}`, panels)
+}`, panels, title)
 }
 
 func generatePanel(metricName, friendlyName string, panelHeight, panelWidth, currentX, currentY int) string {
-
 	gridPos := fmt.Sprintf(`{
         "h": %d,
         "w": %d,
