@@ -26,12 +26,6 @@ func main() {
 	}()
 	otel.SetMeterProvider(meterProvider)
 
-	reports := []string{
-		"release",
-		"snapshot-regression",
-		"snapshot",
-	}
-
 	// Cache API calls to github to prevent repeated calls when testing
 	commitCache := NewSingleFileCache("cache/commit-cache.json")
 	reportCache := NewSingleFileCache("cache/report-cache.json")
@@ -40,6 +34,6 @@ func main() {
 
 	timeframe, _ := generateTimeframeToToday("2022-02-14", 7)
 
-	data := FetchReports(timeframe, *commitCache, *reportCache, client, repo, reports)
-	ConvertReports(reports, timeframe, data, exp, ctx)
+	data := FetchReports(timeframe, *commitCache, *reportCache, client, repo)
+	ConvertReport(timeframe, data, exp, ctx)
 }

@@ -23,13 +23,15 @@ func TestReportReturnsMappedData(t *testing.T) {
 
 	timeframe, _ := generateTimeframeSlice("2022-02-14", "2022-02-15", 1)
 
-	reports := []string{
-		"release",
+	result := FetchReports(timeframe, *commitCache, *reportCache, githubClient, "test-repo")
+	assert.Contains(t, result["2022-02-14"], "Mon Feb 14 05:17:37 UTC 2022")
+
+	err := commitCache.DeleteCache()
+	if err != nil {
+		return
 	}
-
-	result := FetchReports(timeframe, *commitCache, *reportCache, githubClient, "test-repo", reports)
-	assert.Contains(t, result["2022-02-14-release"], "Mon Feb 14 05:17:37 UTC 2022")
-
-	commitCache.DeleteCache()
-	reportCache.DeleteCache()
+	err = reportCache.DeleteCache()
+	if err != nil {
+		return
+	}
 }

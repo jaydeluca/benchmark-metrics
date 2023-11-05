@@ -26,7 +26,7 @@ func generateDashboard(title string, metrics []string) {
 
 	// Update Dashboard based on metrics
 	dashboard := generateDashboardJson(title, strings.Join(panels, ","))
-	err := os.WriteFile(fmt.Sprintf("grafana/dashboards/instrumentation-benchmarks-%v.json", title), []byte(dashboard), 0644)
+	err := os.WriteFile("grafana/dashboards/instrumentation-benchmarks.json", []byte(dashboard), 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -72,7 +72,7 @@ func generateDashboardJson(title, panels string) string {
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Benchmarks (%v)",
+  "title": "%v",
   "uid": "",
   "version": 2,
   "weekStart": ""
