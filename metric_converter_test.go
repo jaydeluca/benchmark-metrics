@@ -24,3 +24,18 @@ func TestConvertReportToDataPoint(t *testing.T) {
 	assert.True(t, expected.Attributes.HasValue("entity"))
 	assert.True(t, result.Attributes.HasValue("entity"))
 }
+
+func TestGenerateMetrics(t *testing.T) {
+	layout := "2006-01-02"
+	dateString := "2023-09-01"
+	date, _ := time.Parse(layout, dateString)
+	dataPoints := []metricdata.DataPoint[float64]{
+		*generateDataPoint("metric1", date, 0.51),
+		*generateDataPoint("metric1", date.AddDate(0, 0, 1), 0.55),
+		*generateDataPoint("metric1", date.AddDate(0, 0, 2), 0.60),
+	}
+	result := generateMetrics("test-metric", dataPoints)
+
+	// data points are private via the aggregation so unable to test the datapoints
+	assert.Equal(t, "test-metric", result.Name)
+}

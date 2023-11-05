@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestGenerateTimeframeSlice(t *testing.T) {
@@ -12,6 +13,14 @@ func TestGenerateTimeframeSlice(t *testing.T) {
 	expected := []string{"2023-09-20", "2023-09-21", "2023-09-22", "2023-09-23"}
 	result, _ := generateTimeframeSlice(start, end, interval)
 	assert.Equal(t, expected, result)
+}
+
+func TestGenerateTimeframeToToday(t *testing.T) {
+	currentTime := time.Now()
+	twoWeeksAgo := currentTime.AddDate(0, 0, -13)
+	twoWeeksAgoString := twoWeeksAgo.Format("2006-01-02")
+	result, _ := generateTimeframeToToday(twoWeeksAgoString, 7)
+	assert.Equal(t, 2, len(result))
 }
 
 func TestConvertDateFormat(t *testing.T) {

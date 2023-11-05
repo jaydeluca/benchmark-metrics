@@ -32,7 +32,7 @@ func ParseReport(report string) ReportMetrics {
 			continue
 		}
 
-		// Bad data in some of the reports
+		// Bad data in some reports
 		if strings.Contains(line, "8796093022208.00") {
 			continue
 		}
