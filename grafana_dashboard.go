@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
 )
 
-func generateDashboard(title string, metrics []string) {
+func generateDashboard(title string, metrics []string) string {
 	var panels []string
 	var currentX = 0
 	var currentY = 0
@@ -15,7 +14,7 @@ func generateDashboard(title string, metrics []string) {
 	panelsPerRow := 3
 
 	for _, metric := range metrics {
-		panels = append(panels, generatePanel(metric, metric, panelHeight, panelWidth, currentX, currentY))
+		panels = append(panels, generatePanel(metric, panelHeight, panelWidth, currentX, currentY))
 		// Update the current position for the next panel
 		currentX += panelWidth
 		if currentX >= panelsPerRow*panelWidth {
@@ -23,13 +22,7 @@ func generateDashboard(title string, metrics []string) {
 			currentY += panelHeight
 		}
 	}
-
-	// Update Dashboard based on metrics
-	dashboard := generateDashboardJson(title, strings.Join(panels, ","))
-	err := os.WriteFile("grafana/dashboards/instrumentation-benchmarks.json", []byte(dashboard), 0644)
-	if err != nil {
-		panic(err)
-	}
+	return generateDashboardJson(title, strings.Join(panels, ","))
 }
 
 func generateDashboardJson(title, panels string) string {
@@ -79,7 +72,7 @@ func generateDashboardJson(title, panels string) string {
 }`, panels, title)
 }
 
-func generatePanel(metricName, friendlyName string, panelHeight, panelWidth, currentX, currentY int) string {
+func generatePanel(metricName string, panelHeight, panelWidth, currentX, currentY int) string {
 	gridPos := fmt.Sprintf(`{
         "h": %d,
         "w": %d,
@@ -181,5 +174,5 @@ func generatePanel(metricName, friendlyName string, panelHeight, panelWidth, cur
       ],
       "title": "%s",
       "type": "timeseries"
-    }`, gridPos, metricName, friendlyName)
+    }`, gridPos, metricName, metricName)
 }
