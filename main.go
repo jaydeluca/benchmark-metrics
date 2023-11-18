@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/google/go-github/v56/github"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/sdk/metric"
@@ -10,8 +11,8 @@ import (
 )
 
 func main() {
-	token := os.Getenv("GITHUB_TOKEN")
-	repo := "open-telemetry/opentelemetry-java-instrumentation"
+	repo := "opentelemetry-java-instrumentation"
+	owner := "open-telemetry"
 
 	ctx := context.Background()
 	exp, err := otlpmetricgrpc.New(ctx)
@@ -30,11 +31,16 @@ func main() {
 	// Cache API calls to github to prevent repeated calls when testing
 	commitCache := NewSingleFileCache("cache/commit-cache.json")
 	reportCache := NewSingleFileCache("cache/report-cache.json")
-	client := NewGitHubClient(token)
+	client := &github.Client{}
+	githubService := &GithubService{
+		repo:         repo,
+		owner:        owner,
+		gitHubClient: client,
+	}
 	timeframe, _ := generateTimeframeToToday("2022-02-14", 7)
 
 	benchmarkReport := BenchmarkReport{}
-	benchmarkReport.FetchReports(timeframe, *commitCache, *reportCache, client, repo)
+	benchmarkReport.FetchReports(ctx, timeframe, *commitCache, *reportCache, githubService)
 	benchmarkReport.GenerateReport(timeframe)
 
 	// export to collector

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
+	"time"
 )
 
 type BenchmarkReport struct {
@@ -35,34 +37,35 @@ func (b *BenchmarkReport) GenerateReport(timeframe []string) {
 	b.MetricNames = metricNames
 }
 
-func (b *BenchmarkReport) FetchReports(timeframe []string, commitCache, reportCache SingleFileCache, client ReportSource, repo string) {
+func (b *BenchmarkReport) FetchReports(ctx context.Context, timeframe []string, commitCache, reportCache SingleFileCache, githubService RepoSource) {
 	results := make(map[string]string)
 
 	for _, timestamp := range timeframe {
-		var commit string
+		var commitSHA string
 		cached, _ := commitCache.RetrieveValue(timestamp)
 		if cached == "" {
-			commit, _ = client.GetMostRecentCommit(repo, timestamp, "gh-pages")
-			err := commitCache.AddToCache(timestamp, commit)
+			convertedTimestamp, _ := time.Parse(layout, timestamp)
+			commitSHA = githubService.GetMostRecentCommitSHA(ctx, convertedTimestamp, "gh-pages")
+			err := commitCache.AddToCache(timestamp, commitSHA)
 			if err != nil {
 				fmt.Println("Error adding to cache")
 			}
 		} else {
-			commit = cached
+			commitSHA = cached
 		}
 
-		var contents string
+		var contents FileContents
 		cached, _ = reportCache.RetrieveValue(timestamp)
 		if cached == "" {
-			contents, _ = client.GetFileAtCommit(repo, "benchmark-overhead/results/release/summary.txt", commit)
-			err := reportCache.AddToCache(timestamp, contents)
+			contents = githubService.GetFileContentsAtCommit(ctx, commitSHA)
+			err := reportCache.AddToCache(timestamp, contents.raw)
 			if err != nil {
 				fmt.Println("Error adding to cache")
 			}
 		} else {
-			contents = cached
+			contents = FileContents{raw: cached}
 		}
-		results[timestamp] = contents
+		results[timestamp] = contents.ToString()
 
 	}
 	b.ReportData = results
