@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"context"
@@ -30,10 +30,13 @@ func (fc *FileContents) ToString() string {
 
 func (gs *GithubService) GetMostRecentCommitSHA(ctx context.Context, timestamp time.Time, branch string) string {
 	opts := &github.CommitsListOptions{
-		Since: timestamp,
+		Until: timestamp,
 		SHA:   branch,
 	}
-	result, _, _ := gs.gitHubClient.Repositories.ListCommits(ctx, gs.owner, gs.repo, opts)
+	result, _, err := gs.gitHubClient.Repositories.ListCommits(ctx, gs.owner, gs.repo, opts)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return *result[0].SHA
 }
 

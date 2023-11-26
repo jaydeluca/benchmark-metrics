@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func (b *BenchmarkReport) GenerateReport(timeframe []string) {
 				if _, ok := dataPoints[metricName]; !ok {
 					dataPoints[metricName] = []metricdata.DataPoint[float64]{}
 				}
-				dataPoints[metricName] = append(dataPoints[metricName], *generateDataPoint(entity, report.Date, metricValue))
+				dataPoints[metricName] = append(dataPoints[metricName], *GenerateDataPoint(entity, report.Date, metricValue))
 			}
 		}
 	}
@@ -30,10 +30,10 @@ func (b *BenchmarkReport) GenerateReport(timeframe []string) {
 	var metricNames []string
 	var metrics []metricdata.Metrics
 	for metric, metricData := range dataPoints {
-		metrics = append(metrics, *generateMetrics(metric, metricData))
+		metrics = append(metrics, *GenerateMetrics(metric, metricData))
 		metricNames = append(metricNames, metric)
 	}
-	b.ResourceMetrics = *generateResourceMetrics(metrics)
+	b.ResourceMetrics = *GenerateResourceMetrics(metrics)
 	b.MetricNames = metricNames
 }
 

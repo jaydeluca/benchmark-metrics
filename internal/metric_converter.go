@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"go.opentelemetry.io/otel/attribute"
@@ -16,7 +16,7 @@ var (
 	scope = instrumentation.Scope{Name: "test-results", Version: "v0.0.1"}
 )
 
-func generateDataPoint(entity string, date time.Time, value float64) *metricdata.DataPoint[float64] {
+func GenerateDataPoint(entity string, date time.Time, value float64) *metricdata.DataPoint[float64] {
 	return &metricdata.DataPoint[float64]{
 		Attributes: attribute.NewSet(attribute.String("entity", entity)),
 		StartTime:  date,
@@ -25,7 +25,7 @@ func generateDataPoint(entity string, date time.Time, value float64) *metricdata
 	}
 }
 
-func generateMetrics(metricName string, dataPoints []metricdata.DataPoint[float64]) *metricdata.Metrics {
+func GenerateMetrics(metricName string, dataPoints []metricdata.DataPoint[float64]) *metricdata.Metrics {
 	return &metricdata.Metrics{
 		Name:        metricName,
 		Description: "",
@@ -38,7 +38,7 @@ func generateMetrics(metricName string, dataPoints []metricdata.DataPoint[float6
 	}
 }
 
-func generateResourceMetrics(metrics []metricdata.Metrics) *metricdata.ResourceMetrics {
+func GenerateResourceMetrics(metrics []metricdata.Metrics) *metricdata.ResourceMetrics {
 	return &metricdata.ResourceMetrics{
 		Resource: res,
 		ScopeMetrics: []metricdata.ScopeMetrics{

@@ -1,6 +1,7 @@
 # Benchmark Metrics
 
 ![Coverage](.github/badges/coverage.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/jaydeluca/benchmark-metrics)](https://goreportcard.com/report/github.com/jaydeluca/benchmark-metrics)
 
 ## Context
 

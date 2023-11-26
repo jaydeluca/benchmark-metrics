@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -18,7 +18,7 @@ func TestConvertReportToDataPoint(t *testing.T) {
 		Time:       time.Now(),
 		Value:      0.51,
 	}
-	result := generateDataPoint("none", date, 0.51)
+	result := GenerateDataPoint("none", date, 0.51)
 	assert.Equal(t, expected.StartTime, result.StartTime)
 	assert.Equal(t, expected.Value, result.Value)
 	assert.True(t, expected.Attributes.HasValue("entity"))
@@ -30,11 +30,11 @@ func TestGenerateMetrics(t *testing.T) {
 	dateString := "2023-09-01"
 	date, _ := time.Parse(layout, dateString)
 	dataPoints := []metricdata.DataPoint[float64]{
-		*generateDataPoint("metric1", date, 0.51),
-		*generateDataPoint("metric1", date.AddDate(0, 0, 1), 0.55),
-		*generateDataPoint("metric1", date.AddDate(0, 0, 2), 0.60),
+		*GenerateDataPoint("metric1", date, 0.51),
+		*GenerateDataPoint("metric1", date.AddDate(0, 0, 1), 0.55),
+		*GenerateDataPoint("metric1", date.AddDate(0, 0, 2), 0.60),
 	}
-	result := generateMetrics("test-metric", dataPoints)
+	result := GenerateMetrics("test-metric", dataPoints)
 
 	// data points are private via the aggregation so unable to test the datapoints
 	assert.Equal(t, "test-metric", result.Name)

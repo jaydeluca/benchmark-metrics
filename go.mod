@@ -23,8 +23,11 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/migueleliasweb/go-github-mock v0.0.22 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/spf13/cobra v1.8.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric v0.42.0 // indirect
 	go.opentelemetry.io/otel/metric v1.19.0 // indirect
 	go.opentelemetry.io/otel/trace v1.19.0 // indirect

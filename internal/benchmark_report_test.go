@@ -1,10 +1,11 @@
-package main
+package internal
 
 import (
 	"context"
 	"github.com/google/go-github/v56/github"
 	"github.com/migueleliasweb/go-github-mock/src/mock"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 	"time"
 )
@@ -49,6 +50,12 @@ func (c *TestGithubService) GetFileContentsAtCommit(ctx context.Context, sha str
 }
 
 func TestFetchReportResultsInTimestampMappedReportData(t *testing.T) {
+	err := os.Mkdir("cache", 0755)
+	if err != nil {
+		panic(err)
+	}
+	defer os.RemoveAll("cache")
+
 	commitCache := NewSingleFileCache("cache/test-commit-cache.json")
 	reportCache := NewSingleFileCache("cache/test-report-cache.json")
 	mockedHttpClient := mock.NewMockedHTTPClient()
@@ -67,7 +74,7 @@ func TestFetchReportResultsInTimestampMappedReportData(t *testing.T) {
 	benchmarkReport.FetchReports(ctx, timeframe, *commitCache, *reportCache, githubService)
 	assert.Contains(t, benchmarkReport.ReportData["2022-02-14"], "Mon Feb 14 05:17:37 UTC 2022")
 
-	err := commitCache.DeleteCache()
+	err = commitCache.DeleteCache()
 	if err != nil {
 		return
 	}
@@ -78,6 +85,12 @@ func TestFetchReportResultsInTimestampMappedReportData(t *testing.T) {
 }
 
 func TestGenerateReportResultsInPopulatedMetrics(t *testing.T) {
+	err := os.Mkdir("cache", 0755)
+	if err != nil {
+		panic(err)
+	}
+	defer os.RemoveAll("cache")
+
 	commitCache := NewSingleFileCache("cache/test-commit-cache2.json")
 	reportCache := NewSingleFileCache("cache/test-report-cache2.json")
 	mockedHttpClient := mock.NewMockedHTTPClient()
@@ -98,7 +111,7 @@ func TestGenerateReportResultsInPopulatedMetrics(t *testing.T) {
 	assert.Len(t, benchmarkReport.ResourceMetrics.ScopeMetrics[0].Metrics, 17)
 	assert.Contains(t, benchmarkReport.MetricNames, "Max. CPU (user) %")
 
-	err := commitCache.DeleteCache()
+	err = commitCache.DeleteCache()
 	if err != nil {
 		return
 	}
