@@ -1,57 +1,22 @@
+/*
+Copyright © 2023 Jay DeLuca
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package main
 
-import (
-	"context"
-	"fmt"
-	"github.com/google/go-github/v56/github"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
-	"go.opentelemetry.io/otel/sdk/metric"
-	"os"
-)
+import "github.com/jaydeluca/benchmark-metrics/cmd"
 
 func main() {
-	repo := "opentelemetry-java-instrumentation"
-	owner := "open-telemetry"
-
-	ctx := context.Background()
-	exp, err := otlpmetricgrpc.New(ctx)
-	if err != nil {
-		panic(err)
-	}
-
-	meterProvider := metric.NewMeterProvider(metric.WithReader(metric.NewPeriodicReader(exp)))
-	defer func() {
-		if err := meterProvider.Shutdown(ctx); err != nil {
-			panic(err)
-		}
-	}()
-	otel.SetMeterProvider(meterProvider)
-
-	// Cache API calls to github to prevent repeated calls when testing
-	commitCache := NewSingleFileCache("cache/commit-cache.json")
-	reportCache := NewSingleFileCache("cache/report-cache.json")
-	client := &github.Client{}
-	githubService := &GithubService{
-		repo:         repo,
-		owner:        owner,
-		gitHubClient: client,
-	}
-	timeframe, _ := generateTimeframeToToday("2022-02-14", 7)
-
-	benchmarkReport := BenchmarkReport{}
-	benchmarkReport.FetchReports(ctx, timeframe, *commitCache, *reportCache, githubService)
-	benchmarkReport.GenerateReport(timeframe)
-
-	// export to collector
-	fmt.Print("Exporting metrics")
-	_ = exp.Export(ctx, &benchmarkReport.ResourceMetrics)
-
-	// create grafana dashboard
-	dashboard := generateDashboard("Benchmark Metrics", benchmarkReport.MetricNames)
-	err = os.WriteFile("grafana/dashboards/instrumentation-benchmarks.json", []byte(dashboard), 0644)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Print("Generated dashboard")
+	cmd.Execute()
 }
