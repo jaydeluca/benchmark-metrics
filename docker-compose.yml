@@ -3,7 +3,7 @@ services:
 
   # Collector
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.83.0
+    image: otel/opentelemetry-collector-contrib:0.119.0
     restart: always
     command: ["--config=/etc/otel-collector-config.yaml", "--set=service.telemetry.logs.level=INFO"]
     volumes:
