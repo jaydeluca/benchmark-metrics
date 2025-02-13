@@ -167,7 +167,7 @@ func generatePanel(metricName string, panelHeight, panelWidth, currentX, current
             }
           },
           "queryType": "sql",
-          "rawSql": "SELECT\n    MetricName,\n    StartTimeUnix,\n    MAX(IF(Attributes['entity'] = 'none', Value, NULL)) AS none,\n    MAX(IF(Attributes['entity'] = 'snapshot', Value, NULL)) AS snapshot,\n    MAX(IF(Attributes['entity'] = 'latest', Value, NULL)) AS latest\nFROM otel.otel_metrics_sum\nWHERE MetricName = '%s'\nGROUP BY MetricName, StartTimeUnix\nORDER BY StartTimeUnix;",
+          "rawSql": "SELECT\n    MetricName,\n    StartTimeUnix,\n    MAX(IF(Attributes['entity'] = 'none', Value, NULL)) AS none,\n    MAX(IF(Attributes['entity'] = 'snapshot', Value, NULL)) AS snapshot,\n    MAX(IF(Attributes['entity'] = 'latest', Value, NULL)) AS latest\nFROM default.otel_metrics_sum\nWHERE MetricName = '%s'\nGROUP BY MetricName, StartTimeUnix\nORDER BY StartTimeUnix;",
           "refId": "A",
           "selectedFormat": 4
         }

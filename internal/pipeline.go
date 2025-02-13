@@ -37,14 +37,14 @@ func Run() {
 		owner:        owner,
 		gitHubClient: client,
 	}
-	timeframe, _ := generateTimeframeToToday("2022-02-14", 3)
+	timeframe, _ := generateTimeframeToToday("2022-02-14", 2)
 
 	benchmarkReport := BenchmarkReport{}
 	benchmarkReport.FetchReports(ctx, timeframe, *commitCache, *reportCache, githubService)
 	benchmarkReport.GenerateReport(timeframe)
 
 	// export to collector
-	fmt.Print("Exporting metrics")
+	fmt.Println("Exporting metrics")
 	_ = exp.Export(ctx, &benchmarkReport.ResourceMetrics)
 
 	// create grafana dashboard
@@ -53,5 +53,5 @@ func Run() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Print("Generated dashboard")
+	fmt.Println("Generated dashboard")
 }
