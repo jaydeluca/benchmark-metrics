@@ -8,6 +8,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"os"
+	"time"
 )
 
 func Run() {
@@ -37,7 +38,9 @@ func Run() {
 		owner:        owner,
 		gitHubClient: client,
 	}
-	timeframe, _ := generateTimeframeToToday("2022-02-14", 2)
+	// Calculate start date: 15 months before today
+	startDate := time.Now().AddDate(0, -15, 0)
+	timeframe, _ := generateTimeframeToToday(startDate.Format("2006-01-02"), 2)
 
 	benchmarkReport := BenchmarkReport{}
 	benchmarkReport.FetchReports(ctx, timeframe, *commitCache, *reportCache, githubService)

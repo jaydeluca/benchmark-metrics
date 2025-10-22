@@ -27,8 +27,8 @@ func ParseReport(report string) ReportMetrics {
 	}
 
 	for _, line := range metricsSplit {
-		// skip header line and time
-		if strings.HasPrefix(line, "Agent") || strings.HasPrefix(line, "Run duration") || line == "" {
+		// skip header line
+		if strings.HasPrefix(line, "Agent") || line == "" {
 			continue
 		}
 
@@ -38,10 +38,17 @@ func ParseReport(report string) ReportMetrics {
 		}
 
 		metricList := strings.Split(line, ":")
+		if len(metricList) < 2 {
+			continue
+		}
+
 		metricName := strings.TrimSpace(metricList[0])
 
 		for index, value := range entities {
 			silo := splitByMultipleSpaces(metricList[1])
+			if index >= len(silo) {
+				continue
+			}
 			thisMetric, err := strconv.ParseFloat(silo[index], 32)
 			if err == nil {
 				metrics[value][metricName] = math.Round(thisMetric*100) / 100
