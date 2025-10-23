@@ -6,8 +6,8 @@ import (
 )
 
 func TestGenerateDashboard(t *testing.T) {
-	result := generateDashboard("test", []string{"cpu", "memory"})
+	result := generateDashboard("test", []string{"Startup time (ms)", "Run duration"})
 
-	assert.Contains(t, result, "WHERE MetricName = 'cpu'")
-	assert.Contains(t, result, "WHERE MetricName = 'memory'")
+	assert.Contains(t, result, "WHERE MetricName = 'Startup time (ms)'")
+	assert.Contains(t, result, "WHERE MetricName = 'Run duration'")
 }

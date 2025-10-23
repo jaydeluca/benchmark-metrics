@@ -1,8 +1,9 @@
 package internal
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -36,6 +37,12 @@ func TestParseDateFromSummary(t *testing.T) {
 	expected := "2023-09-01"
 	result := ParseReport(report)
 	assert.Equal(t, expected, result.Date.Format("2006-01-02"))
+}
+
+func TestParseRunDurationFromSummary(t *testing.T) {
+	expected := 1.9 // 00:01:54 in HH:MM:SS format = 0*60 + 1 + 54/60 = 1.9 minutes
+	result := ParseReport(report)
+	assert.Equal(t, expected, result.Metrics["none"]["Run duration"])
 }
 
 func TestParseConfigsFromReport(t *testing.T) {

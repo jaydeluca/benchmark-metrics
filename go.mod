@@ -1,6 +1,6 @@
 module github.com/jaydeluca/benchmark-metrics
 
-go 1.20
+go 1.22
 
 require (
 	github.com/google/go-github/v56 v56.0.0
