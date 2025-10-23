@@ -27,8 +27,8 @@ func ParseReport(report string) ReportMetrics {
 	}
 
 	for _, line := range metricsSplit {
-		// skip header line and time
-		if strings.HasPrefix(line, "Agent") || strings.HasPrefix(line, "Run duration") || line == "" {
+		// skip header line
+		if strings.HasPrefix(line, "Agent") || line == "" {
 			continue
 		}
 
@@ -37,11 +37,41 @@ func ParseReport(report string) ReportMetrics {
 			continue
 		}
 
+		// Handle Run duration timestamp conversion
+		if strings.Contains(line, "Run duration") {
+			metricList := strings.Split(line, ":")
+			if len(metricList) >= 2 {
+				metricName := strings.TrimSpace(metricList[0])
+				// Rejoin the rest since we split on ':' which is also in the timestamp
+				restOfLine := strings.Join(metricList[1:], ":")
+				timestamps := splitByMultipleSpaces(restOfLine)
+
+				for index, entity := range entities {
+					if index >= len(timestamps) {
+						continue
+					}
+					// Parse HH:MM:SS format and convert to total minutes
+					minutes := parseTimestampToSeconds(timestamps[index])
+					if minutes >= 0 {
+						metrics[entity][metricName] = minutes
+					}
+				}
+			}
+			continue
+		}
+
 		metricList := strings.Split(line, ":")
+		if len(metricList) < 2 {
+			continue
+		}
+
 		metricName := strings.TrimSpace(metricList[0])
 
 		for index, value := range entities {
 			silo := splitByMultipleSpaces(metricList[1])
+			if index >= len(silo) {
+				continue
+			}
 			thisMetric, err := strconv.ParseFloat(silo[index], 32)
 			if err == nil {
 				metrics[value][metricName] = math.Round(thisMetric*100) / 100

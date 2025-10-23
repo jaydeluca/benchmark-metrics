@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -63,4 +64,32 @@ func splitByMultipleSpaces(input string) []string {
 		}
 	}
 	return cleanedValues
+}
+
+// parseTimestampToSeconds converts a timestamp in HH:MM:SS format to total minutes
+// Returns -1 if the timestamp cannot be parsed
+func parseTimestampToSeconds(timestamp string) float64 {
+	parts := strings.Split(strings.TrimSpace(timestamp), ":")
+	if len(parts) != 3 {
+		return -1
+	}
+
+	hours, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return -1
+	}
+
+	minutes, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return -1
+	}
+
+	seconds, err := strconv.Atoi(parts[2])
+	if err != nil {
+		return -1
+	}
+
+	// Convert to total minutes: hours * 60 + minutes + seconds / 60
+	totalMinutes := float64(hours*60) + float64(minutes) + float64(seconds)/60.0
+	return totalMinutes
 }

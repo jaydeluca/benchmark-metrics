@@ -20,7 +20,7 @@ func GenerateDataPoint(entity string, date time.Time, value float64) *metricdata
 	return &metricdata.DataPoint[float64]{
 		Attributes: attribute.NewSet(attribute.String("entity", entity)),
 		StartTime:  date,
-		Time:       time.Now(),
+		Time:       date,
 		Value:      value,
 	}
 }

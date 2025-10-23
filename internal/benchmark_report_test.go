@@ -108,8 +108,9 @@ func TestGenerateReportResultsInPopulatedMetrics(t *testing.T) {
 	benchmarkReport := BenchmarkReport{}
 	benchmarkReport.FetchReports(ctx, timeframe, *commitCache, *reportCache, githubService)
 	benchmarkReport.GenerateReport(timeframe)
-	assert.Len(t, benchmarkReport.ResourceMetrics.ScopeMetrics[0].Metrics, 17)
+	assert.Len(t, benchmarkReport.ResourceMetrics.ScopeMetrics[0].Metrics, 18)
 	assert.Contains(t, benchmarkReport.MetricNames, "Max. CPU (user) %")
+	assert.Contains(t, benchmarkReport.MetricNames, "Run duration")
 
 	err = commitCache.DeleteCache()
 	if err != nil {
